@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <input type="button" value="culqi" onclick="culqi_f()">
+</body>
+<script src="https://checkout.culqi.com/js/v3"></script>
+<script
+  src="https://code.jquery.com/jquery-2.2.4.min.js"
+  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
+  crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script src="config.js"></script>
+  <script>
+      function culqi_f(){
+        let data =[{id:1,nombre:"PLAN PREMIUM ",precio:5,temporadas:5}] ; 
+            
+            /*swal-button--cancel*/
+            const wrapper = document.createElement('div');
+            var html_buttons = ""
+            for (let index = 0; index < data.length; index++) {
+                html_buttons+=`<div class="swal-button-container swal-button-plan-login"> 
+                <button class="swal-button swal-button--roll" data-id="`+data[index]["id"]+`" data-nombre="`+data[index]["nombre"]+`" data-monto="`+data[index]["precio"]+`" id="`+(data[index]["temporadas"]==5?`temporada_basico`:`temporada_premium`)+`"> Lo quiero!</button><div class="swal-button__loader">  <div></div><div></div><div></div> </div></div>`;
+            }
+            wrapper.innerHTML =html_buttons;
+                
+            swal({
+                title: "Plan de Membresía ",
+                text: "Para disfrutar de todos los beneficios "+NOMBRE_PAGINA+" debes eligir un plan 😄",
+                icon: "warning",
+                content:wrapper,
+                button:false,
+            });
+
+            $(".swal-button-plan-login").click(function(){
+                let plan = $(this).children().attr("id"),
+                nombre_plan=$(this).children().attr("data-nombre"),
+                monto_plan=$(this).children().attr("data-monto");
+                $(this).addClass("activated");
+                if (plan==null) {
+                return false;
+                }
+                Culqi.publicKey = PUBLIC_KEY_CULQI_TEST;
+                // Abre el formulario con la configuración en Culqi.settings
+                Culqi.settings({
+                title: (nombre_plan),
+                currency: 'PEN',
+                description: 'PAGO DE MEMBRESÍA',
+                amount: monto_plan
+                });
+                Culqi.open();
+                e.preventDefault();
+            });
+      }
+      function culqi() {
+            if (Culqi.token) { // ¡Objeto Token creado exitosamente!
+                var token = Culqi.token.id;
+                var email_token = Culqi.token.email;
+                let data = {token:token,email_token:email_token};
+                //appVue.postCulqi(data);
+                $.ajax({
+                    method: "POST",
+                    url: "index.php",
+                    data: data
+                })
+                .done(function( data ) {
+                        console.log(data)
+                });
+            } else { // ¡Hubo algún problema!
+            // Mostramos JSON de objeto error en consola
+            console.log(Culqi.error);
+            alert(Culqi.error.user_message);
+            }
+        }
+        
+  </script>
+</html>
